@@ -57,7 +57,7 @@
   <header>
     <div class="logo-badge">가천대학교 · 글로벌캠퍼스</div>
     <h1>가천대 <span>길잡이</span></h1>
-    <p class="sub">Google Maps 도보 길찾기 기반으로 건물 간 실제 경로를 안내합니다</p>
+    <p class="sub">직접 입력한 건물 좌표와 Google Maps 도보 길찾기 기반으로 실제 경로를 안내합니다</p>
   </header>
   <main>
     <div class="selector-section">
@@ -71,7 +71,7 @@
     <div class="same-warn" id="sameWarn">출발지와 도착지가 같습니다.</div>
     <div class="api-guide" id="apiGuide">
       <div class="guide-title">Google Maps API 키 설정 필요</div>
-      <p>파일 맨 아래의 <code>AIzaSyCZ3w4NsSl6FYOIwSKXjq1urJPY824eNIU</code> 부분을 본인의 Google Maps API 키로 바꿔주세요.</p>
+      <p>현재 파일에는 전달받은 Google Maps API 키가 적용되어 있습니다. 지도 또는 경로가 안 뜨면 Google Cloud 설정을 확인하세요.</p>
       <p>Google Cloud Console에서 <b>Maps JavaScript API</b>와 <b>Directions API</b>를 활성화해야 경로가 표시됩니다.</p>
     </div>
     <div class="result-card" id="resultCard">
@@ -97,19 +97,19 @@
 
   <script>
     const BUILDINGS = [
-      { id:'vision', name:'비전타워', lat:37.44888, lng:127.12660, color:'#58a6ff', desc:'가천대역 직결 · 학생식당 · 법과대' },
-      { id:'global', name:'글로벌센터', lat:37.44938, lng:127.12712, color:'#a371f7', desc:'영어강의 · G-LAC' },
-      { id:'semi', name:'반도체대학', lat:37.44895, lng:127.12700, color:'#f47067', desc:'화공·반도체 강의' },
-      { id:'bio_nano_u', name:'바이오나노대학', lat:37.44975, lng:127.12810, color:'#56d364', desc:'바이오나노 강의동' },
-      { id:'bio_res', name:'바이오나노연구원', lat:37.44870, lng:127.12790, color:'#79c0ff', desc:'연구 시설' },
-      { id:'eng2', name:'공과대학2', lat:37.44845, lng:127.12835, color:'#8b949e', desc:'공학 강의동' },
-      { id:'gachon', name:'가천관', lat:37.44970, lng:127.12920, color:'#3fb950', desc:'대학본부 · 지하2~지상12층' },
-      { id:'lifelong', name:'평생교육원', lat:37.45060, lng:127.12920, color:'#8b949e', desc:'평생교육 · 행정지원실' },
-      { id:'edu_grad', name:'교육대학원', lat:37.45020, lng:127.13050, color:'#d2a8ff', desc:'대학원 강의동' },
-      { id:'lib', name:'중앙도서관', lat:37.45080, lng:127.13250, color:'#f78166', desc:'헐떡고개 위 · 10~15분 소요' },
-      { id:'student', name:'학생회관', lat:37.45130, lng:127.13430, color:'#e3b341', desc:'학생 편의시설' },
-      { id:'ai', name:'AI관', lat:37.45250, lng:127.13430, color:'#ffa657', desc:'2022년 신축 · IT·AI 강의' },
-      { id:'dorm1', name:'제1학생생활관', lat:37.45380, lng:127.13560, color:'#79c0ff', desc:'기숙사 · 남위례역 도보 가능' },
+      { id:'vision', name:'비전타워', lat:37.449594, lng:127.127125, color:'#58a6ff', desc:'가천대역 직결 · 학생식당 · 법과대' },
+      { id:'global', name:'글로벌센터', lat:37.451922, lng:127.127115, color:'#a371f7', desc:'영어강의 · G-LAC' },
+      { id:'semi', name:'반도체대학', lat:37.451085, lng:127.127176, color:'#f47067', desc:'화공·반도체 강의' },
+      { id:'bio_nano_u', name:'바이오나노대학', lat:37.452552, lng:127.129012, color:'#56d364', desc:'바이오나노 강의동' },
+      { id:'bio_res', name:'바이오나노연구원', lat:37.449830, lng:127.128088, color:'#79c0ff', desc:'연구 시설' },
+      { id:'eng2', name:'공과대학2', lat:37.449317, lng:127.128412, color:'#8b949e', desc:'공학 강의동' },
+      { id:'gachon', name:'가천관', lat:37.450457, lng:127.129803, color:'#3fb950', desc:'대학본부 · 지하2~지상12층' },
+      { id:'lifelong', name:'평생교육원', lat:37.452698, lng:127.129922, color:'#8b949e', desc:'평생교육 · 행정지원실' },
+      { id:'edu_grad', name:'교육대학원', lat:37.451889, lng:127.131717, color:'#d2a8ff', desc:'대학원 강의동' },
+      { id:'lib', name:'중앙도서관', lat:37.452236, lng:127.132838, color:'#f78166', desc:'헐떡고개 위 · 10~15분 소요' },
+      { id:'student', name:'학생회관', lat:37.453159, lng:127.134447, color:'#e3b341', desc:'학생 편의시설' },
+      { id:'ai', name:'AI관', lat:37.455218, lng:127.133906, color:'#ffa657', desc:'2022년 신축 · IT·AI 강의' },
+      { id:'dorm1', name:'제1학생생활관', lat:37.456415, lng:127.135176, color:'#79c0ff', desc:'기숙사 · 남위례역 도보 가능' },
     ];
     const HILL_UPPER = new Set(['lib','student','ai','dorm1']);
     const TIPS = {
@@ -136,20 +136,42 @@
       grid.appendChild(item);
     });
     let map, directionsService, directionsRenderer;
+    const buildingMarkers = new Map();
     function getKey(a,b){ return [a,b].sort().join('_'); }
     function isHill(a,b){ return HILL_UPPER.has(a) !== HILL_UPPER.has(b); }
     function findBuilding(id){ return BUILDINGS.find(b => b.id === id); }
     function initMap(){
       document.getElementById('apiGuide').style.display='none';
       map = new google.maps.Map(document.getElementById('map'), {
-        center:{lat:37.45050,lng:127.13050}, zoom:16, mapTypeControl:false, streetViewControl:false, fullscreenControl:true
+        center:{lat:37.45250,lng:127.13100}, zoom:16, mapTypeControl:false, streetViewControl:false, fullscreenControl:true
       });
       directionsService = new google.maps.DirectionsService();
       directionsRenderer = new google.maps.DirectionsRenderer({
         map,
-        suppressMarkers:false, // Google Directions가 계산한 실제 출발/도착 지점에 기본 마커 표시
+        suppressMarkers:true, // 출발/도착 마커는 아래 건물 마커를 그대로 사용합니다.
         polylineOptions:{ strokeWeight:5, strokeOpacity:.9 }
       });
+
+      BUILDINGS.forEach((b) => {
+        const marker = new google.maps.Marker({
+          position: { lat: b.lat, lng: b.lng },
+          map,
+          title: b.name,
+          label: { text: b.name.slice(0, 2), fontSize: '11px', fontWeight: '700' },
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            fillColor: b.color,
+            fillOpacity: 1,
+            strokeColor: '#ffffff',
+            strokeWeight: 2
+          }
+        });
+        const info = new google.maps.InfoWindow({ content: `<div style="font-size:13px;font-weight:700;padding:4px 2px;white-space:nowrap">${b.name}</div>` });
+        marker.addListener('click', () => info.open({ anchor: marker, map }));
+        buildingMarkers.set(b.id, marker);
+      });
+
       update();
     }
     window.initMap = initMap;
@@ -177,7 +199,6 @@
       document.getElementById('mapMessage').style.display='none';
       directionsService.route({
         // 건물명 검색은 실패할 수 있어서, 저장된 건물 좌표를 Google Directions에 직접 전달합니다.
-        // 마커는 직접 만들지 않고 DirectionsRenderer가 계산된 경로의 출발/도착 기본 마커를 표시합니다.
         origin: { lat: fromB.lat, lng: fromB.lng },
         destination: { lat: toB.lat, lng: toB.lng },
         travelMode: google.maps.TravelMode.WALKING
@@ -194,12 +215,28 @@
         }
       });
     }
+    function updateMarkerStyles(fromId, toId){
+      buildingMarkers.forEach((marker, id) => {
+        const b = findBuilding(id);
+        const selected = id === fromId || id === toId;
+        marker.setZIndex(selected ? 999 : 1);
+        marker.setIcon({
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: selected ? 12 : 8,
+          fillColor: selected ? '#ffcc00' : b.color,
+          fillOpacity: 1,
+          strokeColor: selected ? '#111111' : '#ffffff',
+          strokeWeight: selected ? 3 : 2
+        });
+      });
+    }
     function update(){
       const fromId=fromSel.value, toId=toSel.value, card=document.getElementById('resultCard'), warn=document.getElementById('sameWarn');
       if(fromId===toId){ card.style.display='none'; warn.style.display='block'; return; }
       warn.style.display='none'; card.style.display='block';
       const fromB=findBuilding(fromId), toB=findBuilding(toId);
       document.getElementById('routeText').textContent = `${fromB.name} → ${toB.name}`;
+      updateMarkerStyles(fromId, toId);
       approxMetrics(fromB,toB);
       if(map && directionsService) route(fromB,toB);
     }
