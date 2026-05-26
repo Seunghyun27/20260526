@@ -71,7 +71,7 @@
     <div class="same-warn" id="sameWarn">출발지와 도착지가 같습니다.</div>
     <div class="api-guide" id="apiGuide">
       <div class="guide-title">Google Maps API 키 설정 필요</div>
-      <p>파일 맨 아래의 <code>YOUR_GOOGLE_MAPS_API_KEY</code> 부분을 본인의 Google Maps API 키로 바꿔주세요.</p>
+      <p>파일 맨 아래의 <code>AIzaSyCZ3w4NsSl6FYOIwSKXjq1urJPY824eNIU</code> 부분을 본인의 Google Maps API 키로 바꿔주세요.</p>
       <p>Google Cloud Console에서 <b>Maps JavaScript API</b>와 <b>Directions API</b>를 활성화해야 경로가 표시됩니다.</p>
     </div>
     <div class="result-card" id="resultCard">
@@ -190,7 +190,7 @@
           directionsRenderer.set('directions', null);
           approxMetrics(fromB,toB);
           const bounds = new google.maps.LatLngBounds(); bounds.extend({lat:fromB.lat,lng:fromB.lng}); bounds.extend({lat:toB.lat,lng:toB.lng}); map.fitBounds(bounds);
-          const msg = document.getElementById('mapMessage'); msg.style.display='block'; msg.textContent='도보 경로를 가져오지 못했습니다. Directions API 설정 또는 캠퍼스 내부 보행 경로 지원 여부를 확인하세요.';
+          const msg = document.getElementById('mapMessage'); msg.style.display='block'; msg.textContent='도보 경로를 가져오지 못했습니다. 오류 코드: ' + status + ' / Google Cloud에서 Directions API 활성화, 결제 계정 연결, API 키 HTTP referrer 제한을 확인하세요.';
         }
       });
     }
@@ -206,7 +206,7 @@
     document.getElementById('swapBtn').addEventListener('click',()=>{ const t=fromSel.value; fromSel.value=toSel.value; toSel.value=t; update(); });
     fromSel.addEventListener('change',update); toSel.addEventListener('change',update);
   </script>
-  <!-- 아래 YOUR_GOOGLE_MAPS_API_KEY를 본인 Google Maps API 키로 바꿔주세요. -->
+  <!-- 아래 AIzaSyCZ3w4NsSl6FYOIwSKXjq1urJPY824eNIU를 본인 Google Maps API 키로 바꿔주세요. -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ3w4NsSl6FYOIwSKXjq1urJPY824eNIU&callback=initMap&language=ko&region=KR"></script>
 </body>
 </html>
