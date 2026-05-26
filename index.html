@@ -176,10 +176,10 @@
     function route(fromB,toB){
       document.getElementById('mapMessage').style.display='none';
       directionsService.route({
-        // 좌표를 직접 마커로 찍지 않고, Google Maps가 장소명을 해석해서
-        // 경로와 출발/도착 마커를 함께 표시하게 함
-        origin: `${fromB.name}, 가천대학교 글로벌캠퍼스, 성남시`,
-        destination: `${toB.name}, 가천대학교 글로벌캠퍼스, 성남시`,
+        // 건물명 검색은 실패할 수 있어서, 저장된 건물 좌표를 Google Directions에 직접 전달합니다.
+        // 마커는 직접 만들지 않고 DirectionsRenderer가 계산된 경로의 출발/도착 기본 마커를 표시합니다.
+        origin: { lat: fromB.lat, lng: fromB.lng },
+        destination: { lat: toB.lat, lng: toB.lng },
         travelMode: google.maps.TravelMode.WALKING
       }, (response, status) => {
         if(status === 'OK'){
@@ -190,7 +190,7 @@
           directionsRenderer.set('directions', null);
           approxMetrics(fromB,toB);
           const bounds = new google.maps.LatLngBounds(); bounds.extend({lat:fromB.lat,lng:fromB.lng}); bounds.extend({lat:toB.lat,lng:toB.lng}); map.fitBounds(bounds);
-          const msg = document.getElementById('mapMessage'); msg.style.display='block'; msg.textContent='도보 경로를 가져오지 못했습니다. 건물명 검색 또는 Directions API 설정을 확인하세요.';
+          const msg = document.getElementById('mapMessage'); msg.style.display='block'; msg.textContent='도보 경로를 가져오지 못했습니다. Directions API 설정 또는 캠퍼스 내부 보행 경로 지원 여부를 확인하세요.';
         }
       });
     }
@@ -207,6 +207,6 @@
     fromSel.addEventListener('change',update); toSel.addEventListener('change',update);
   </script>
   <!-- 아래 YOUR_GOOGLE_MAPS_API_KEY를 본인 Google Maps API 키로 바꿔주세요. -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ3w4NsSl6FYOIwSKXjq1urJPY824eNIU&callback=initMap&language=ko&region=KR"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap&language=ko&region=KR"></script>
 </body>
 </html>
